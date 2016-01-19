@@ -1,0 +1,12 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  field: string
+  name: string
+  type: { enum: [ discreet ] }
+  values:
+    type: object
+    properties:
+      min?: number
+      max?: number
+      unit: string

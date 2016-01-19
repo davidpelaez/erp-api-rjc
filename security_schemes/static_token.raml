@@ -1,0 +1,9 @@
+#%RAML 1.0 SecurityScheme
+
+# Definición del esquema de seguridad basado en token estático enviado en
+# los headers. El token es privado y de uso interno del backend del Bizhub
+
+type: x-custom
+describedBy:
+    headers: { X-Auth-Token: {type: string} }
+    responses: { 401: { description: Indica un error en autorización } }

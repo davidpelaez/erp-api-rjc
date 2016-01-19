@@ -1,0 +1,88 @@
+#%RAML 1.0
+title: RJC ERP API
+version: v1
+
+# Se debe enviar el content-type siempre o se puede asumir como default JSON
+mediaType:  application/json
+
+# No se deben aceptar llamadas por HTTP inseguro
+protocols: [ HTTPS ]
+
+# Ejemplo de posible dominio, nótese uso de la versión en la URL
+baseUri: https://colmedellin2.dyndns.org:1024/erp/{version}/
+
+# Todas las llamadas usan el mismo esquema de seguridad
+# No se aceptan llamadas anónimas por seguridad
+securedBy: [static_token]
+
+types:
+
+  # DEFINICION DE LOS TIPOS MAS BASICOS
+
+  # Muchos tipos de dato consisten en un Identificador y su nombre
+  # y por lo tanto se le asigna un nombre común: SimpleDuple
+  # se usa por ejeplos para estilos, motivos, cuentas contables,
+  # tipo de clientes, etc. Definido en otro archivo para reuso
+  SimpleDuple: !include types/simple_duple.raml
+
+  # Un país está identificado por dos letras mayusculas (código ISO)
+  CountryCode: { pattern: "^[A-Z]{2}$" }
+
+  # Una bodega está identifidada por tres letras mayúsculas (código IATA)
+  WarehouseCode: { pattern: "^[A-Z]{3}$" }
+
+  # DEFINICION DE LOS TIPOS QUE DEFINEN CONSTANTES PROVENIENTES DEL ERP
+
+  # Todos estos tipos son simples y consisten en Ids y sus nombres
+  OfficeSegment: { type: SimpleDuple }
+  Zone: { type: SimpleDuple }
+  OfficeType: { type: SimpleDuple }
+  OfficeAccount: { type: SimpleDuple }
+
+  # Nótese que se usa _office_ para hablar de una _sede_ que en un _cliente_
+  # en el ERP, pero aquí se le da el nombre final en inglés.
+  Office: !include types/office.raml
+
+  # Definiciones extraidas a otros archivos en la carpeta types
+  # ver los comentarios de cada tipo en su propio archivo
+  Order: !include types/order.raml
+  Seller: !include types/seller.raml
+  BasicProduct: !include types/basic_product.raml
+  DiscreetFilter: !include types/discreet_filter.raml
+  RangeFilter: !include types/range_filter.raml
+  ErrorMessage: !include types/error_message.raml
+
+  # Representación extendida del producto utilizado en visualización
+  # de un solo producto en vez de una colección. Se utiliza sólo en
+  # ciertos endpoints para evitar cargas innecesarias sobre la base de datos.
+  ExpandedProduct:
+    type: BasicProduct
+    properties:
+      description: string
+      line: string
+      # Información de categorización del producto
+      styles: SimpleDuple[]
+      finishes: SimpleDuple[]
+      types: SimpleDuple[]
+      motives: SimpleDuple[]
+      collections: SimpleDuple[]
+
+  # Un filtro puede ser discreto (una serie de posibilidades, e.j. estilo)
+  # o un rango (por ejemplo el peso de un artículo)
+  Filter: { type: DiscreetFilter | RangeFilter }
+
+# Abstracción de elementos comunes a múltiples recursos
+resourceTypes:
+  collection: !include resource_types/collection.raml
+
+# Abstracción de elementos comunes a múltiples endpoints
+traits:
+
+securitySchemes:
+  static_token: !include security_schemes/static_token.raml
+
+
+/{countryId}/{warehouseId}:
+  uriParameters:
+    countryId: {type: CountryCode}
+    warehouseId: {type: WarehouseCode}

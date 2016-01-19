@@ -1,0 +1,15 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  # El tipo es una constanteen mayúsculas, se proponen los mas comunes pero
+  # se pueden agregar nuevos a la especificacin segn se necesite
+  type:
+    enum:
+      - INVALID_DATA
+      - NOT_FOUND
+      - SERVICE_UNAVAILABLE
+      - UNATHORIZED
+      - NOT_ALLOWED
+      - INTERNAL_SERVER_ERROR
+  # Mensaje que se le pasar al usuario para saber que sucedio
+  message: string

@@ -8,8 +8,9 @@ Se contemplan los siguientes aspectos:
   * Soporte para múltiples países
   * Soporte para bodegas por país
   * Endpoints de información de semi-constantes del ERP como tipo de cliente, zonas, segmentos, etc.
-  * Soporte para busqueda de productos agrupados por línea mediante filtros.
   * Soporte para apuntar a una referencia específica de una línea con información expandida.
+  * Soporte para paginado, ordenamiento y filrado de colecciones (e.j. productos, sedes).
+  * Especificación dinámica de filtrado de colecciones usando selectores (filtros discretos) o rangos.
   * Manejo de autenticación basado en un token pasado en los headers de todas las solicitudes.
   * Estructura unificada para mensajes de error.
   * Mapeo de columnas de las DB del ERP a nombres en inglés para normalización de la interfaz con buenas prácticas REST.

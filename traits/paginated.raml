@@ -1,0 +1,17 @@
+#%RAML 1.0 Trait
+usage: Define "limit", "offset" en el query de la URL para pemitir paginado. Además obliga que toda respuesta contenga en los headers el info del número de items de la colección para poder calcular el número de páginas disponibles.
+queryParameters:
+  limit:
+    description: El número de items por "página"
+    type: integer
+    default: 25
+  offset:
+    description: El número de item en el cual empezar la selección
+    type: integer
+    default: 0
+responses:
+  200:
+    headers:
+      X-Max-Offset:
+        description: El número total de items en la colección
+        type: integer

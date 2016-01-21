@@ -1,0 +1,11 @@
+#%RAML 1.0 Trait
+usage: |
+  Define "order" y "order_by" para organizar una colección.
+  Los ordenamientos se deben aplicar antes de cualquier query sobre la colección para poder permitir búsquedas más avanzadas.
+queryParameters:
+  order:
+    description: La dirección del ordenamiento, asc/desc.
+    enum: [ desc , asc ]
+    default: desc
+  order_by:
+    description: El nombre del campo por el cual ordenar la colección. Debe coincidir con el esquema del tipo, no con el nombre de la columna en la base de datos.

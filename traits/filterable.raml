@@ -1,0 +1,13 @@
+#%RAML 1.0 Trait
+usage: |
+  Una colección se puede filtrar sobre todos sus campos mediante igualdad con ellos valor(es) entregados y en los campos que sean rangos mediante "campo_lt" (menor que) y "campo_gt" (mayor que).
+  _IMPORTANTE_ Dado que los campos dependen del esquema de cada tipo se define sólo como referencia "x", "x_lt", "x_gt" pero en la implementación se debe garantizar que "x" pueda reemplazarse por cualqueier atributo de una entidad que tenga sentido dentro del set de datos. Por ejemplo en products podría aplicarse "style=01,02" o "price_lt=1000000". La aplicación de múltiplos filtros debe dar como resultado su intersección.
+queryParameters:
+  x:
+    description: El valor (o los valores separadso por coma) que el filtro debe permitir sobre el campo X.
+  x_lt:
+    description: El valor máximo que el filtro debe permitir en el campo X.
+    type: number
+  x_gt:
+    description: El valor mínimo que el filtro debe permitir en el campo X.
+    type: number

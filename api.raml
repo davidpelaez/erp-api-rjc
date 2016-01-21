@@ -34,10 +34,11 @@ types:
   # DEFINICION DE LOS TIPOS QUE DEFINEN CONSTANTES PROVENIENTES DEL ERP
 
   # Todos estos tipos son simples y consisten en Ids y sus nombres
-  OfficeSegment: { type: SimpleDuple }
   Zone: { type: SimpleDuple }
+  OfficeSegment: { type: SimpleDuple }
   OfficeType: { type: SimpleDuple }
   OfficeAccount: { type: SimpleDuple }
+  SellerType: { type: SimpleDuple }
 
   # Nótese que se usa _office_ para hablar de una _sede_ que en un _cliente_
   # en el ERP, pero aquí se le da el nombre final en inglés.
@@ -71,18 +72,166 @@ types:
   # o un rango (por ejemplo el peso de un artículo)
   Filter: { type: DiscreetFilter | RangeFilter }
 
-# Abstracción de elementos comunes a múltiples recursos
-resourceTypes:
-  collection: !include resource_types/collection.raml
-
 # Abstracción de elementos comunes a múltiples endpoints
 traits:
 
+  # Aplica para colecciones que se pueden filtrar utilizando parametros en el query
+  Filterable: !include traits/filterable.raml
+  # Aplica para colecciones que se pueden order para incrementar la flexibilidad de los filtros
+  Sortable: !include traits/sortable.raml
+  # Agrega información de paginado a una colección y los parametros para seleccionar páginas exactas
+  Paginated: !include traits/paginated.raml
+
 securitySchemes:
-  static_token: !include security_schemes/static_token.raml
+  # Definición del esquema de seguridad basado en token estático enviado en los headers. El token es privado y de uso interno del backend del Bizhub
+  static_token:
+    type: x-custom
+    describedBy:
+        headers: { X-Auth-Token: {type: string} }
+        responses: { 401: { description: Indica un error en autorización } }
+
 
 
 /{countryId}/{warehouseId}:
+
   uriParameters:
     countryId: {type: CountryCode}
     warehouseId: {type: WarehouseCode}
+
+  /lines/{lineId}:
+
+    # Todos los filtros de una linea vienen expresados como una lista de filtros propios de la línea para perimtiri flexibilidad sobre la definición de filtros y la diferencia que tienen las taxonomías de las líneas
+    /filters:
+      get:
+        responses:
+          200: { body: { type: object, properties: { data: "Filter[]" }}}
+
+    /products:
+      get:
+        # La lista de todos los productos de la linea se puede filtrar, se puede organizar y viene paginada por default
+        is: [Filterable, Paginated, Sortable]
+
+        responses:
+          200:
+            body:
+              type: object
+              properties:
+                # Este arreglo puede ser vacio, en cuyo caso _NO_ no cambia el código HTTP de respuesta, sólamente se debe enviar el arreglo vacio en JSON.
+                # Nótse que el arreglo es de tipo BasicProduct
+                data: "BasicProduct[]"
+
+
+      # Se puede consultar un producto exacto y se recibe información expandida
+      /{productId}:
+        get:
+          responses:
+            200:
+              body:
+                # Aquí se usa ExpandedProduct que trae los datos de categorización del productos para filtrado de la linea, e.j. estilos, motivos, etc.
+                type: ExpandedProduct
+
+  /orders:
+    get:
+      # La lista de todos los pedidos se puede filtrar, se puede organizar y viene paginada por default
+      is: [Filterable, Paginated, Sortable]
+
+      responses:
+        200:
+          body:
+            type: object
+            properties:
+              # Este arreglo puede ser vacio, en cuyo caso _NO_ no cambia el código HTTP de respuesta, sólamente se debe enviar el arreglo vacio en JSON.
+              data: Order[]
+
+    post:
+      # Para crear una nueva entrada se envia en el body la entidad _SIN_ Id, el API asigna un ID automáticamente y devuelve toda la entidad
+      responses:
+        201: { body: { type: Order }}
+        # Cuando los datos son rechazados por validaciones del ERP devuelve 422.
+        422: { body: {type: ErrorMessage }}
+
+    /{orderId}:
+      # Se puede consultar una sede en particular y es editable con PATCH.
+      get: { responses: { 200: { body: { type: Order }}}}
+      # Patch actualiza los campos de la entidad que vayan en el body
+      patch: { responses: { 200: { body: { type: Order }}}}
+
+  /offices:
+    get:
+      # La lista de todos las sedes (clientes) se puede filtrar, se puede organizar y viene paginada por default
+      is: [Filterable, Paginated, Sortable]
+
+      responses:
+        200:
+          body:
+            type: object
+            properties:
+              # Este arreglo puede ser vacio, en cuyo caso _NO_ no cambia el código HTTP de respuesta, sólamente se debe enviar el arreglo vacio en JSON.
+              data: Office[]
+
+    post:
+      # Para crear una nueva entrada se envia en el body la entidad _SIN_ Id, el API asigna un ID automáticamente y devuelve toda la entidad
+      responses:
+        201: { body: { type: Office }}
+        # Cuando los datos son rechazados por validaciones del ERP devuelve 422.
+        422: { body: {type: ErrorMessage }}
+
+    /{officeId}:
+      # Se puede consultar una sede en particular y es editable con PATCH.
+      get: { responses: { 200: { body: { type: Office }}}}
+      # Patch actualiza los campos de la entidad que vayan en el body
+      patch: { responses: { 200: { body: { type: Office }}}}
+
+  /sellers:
+    get:
+      # La lista de todos las sedes (clientes) se puede filtrar, se puede organizar y viene paginada por default
+      is: [Filterable, Paginated, Sortable]
+
+      responses:
+        200:
+          body:
+            type: object
+            properties:
+              # Este arreglo puede ser vacio, en cuyo caso _NO_ no cambia el código HTTP de respuesta, sólamente se debe enviar el arreglo vacio en JSON.
+              data: Seller[]
+
+    post:
+      # Para crear una nueva entrada se envia en el body la entidad _SIN_ Id, el API asigna un ID automáticamente y devuelve toda la entidad
+      responses:
+        201: { body: { type: Seller }}
+        # Cuando los datos son rechazados por validaciones del ERP devuelve 422.
+        422: { body: {type: ErrorMessage }}
+
+    /{sellerId}:
+      # Se puede consultar un vendedor en particular y es editable con PATCH.
+      # Se puede consultar una sede en particular y es editable con PATCH.
+      get: { responses: { 200: { body: { type: Seller }}}}
+      # Patch actualiza los campos de la entidad que vayan en el body
+      patch: { responses: { 200: { body: { type: Seller }}}}
+
+  # DEFINICION DE LISTAS DE SOLO LECTURA USADAS COMO SELECTORES EN EL BIZHUB
+
+  /zones:
+    get:
+      responses:
+        200: { body: { type: object, properties: { data: "Zone[]" }}}
+
+  /offices_segments:
+    get:
+      responses:
+        200: { body: { type: object, properties: { data: "OfficeSegment[]" }}}
+
+  /offices_accounts:
+    get:
+      responses:
+        200: { body: { type: object, properties: { data: "OfficeAccount[]" }}}
+
+  /offices_types:
+    get:
+      responses:
+        200: { body: { type: object, properties: { data: "OfficeType[]" }}}
+
+  /sellers_types:
+    get:
+      responses:
+        200: { body: { type: object, properties: { data: "SellerType[]" }}}

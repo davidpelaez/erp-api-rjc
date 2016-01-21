@@ -20,6 +20,7 @@ Se contemplan los siguientes aspectos:
 Pendientes:
 
   * Las columnas cuyo significado no es claro se han nombrado con el patrón x_nombre_de_columna. Es necesario renombrar estas columnas a su equivalente en inglés.
+  * Se debe documentar cómo se calculan los precios de un pedido según el cliente para conocer como se debe estructurar un pedido para crearlo y como calcular el precio final que tendrá.
 
 Consideraciones importantes:
 
@@ -28,3 +29,13 @@ Consideraciones importantes:
   * Si los filtros y clasificaciones de productos varian o no por bodega es indifrente para el API. Se implementan todos los endpoints como recursos anidado dentro de la URL de las bodegas con el fin de adaptar el diseño al patrón de consumo.
   * Hay comentarios en todo el código para hacer más simple la lectura.
   * El API estblace un patrón de acceso pero n o neecsariamente refleja uno a uno la estructura de la base de datos y esa asimetría debe ser manejada por el implementador.
+  * El endpoint de pedidos acepta la creación de todo el pedido incluidos sus renglones en su sólo endpoint.
+  * Cuando se actualicé un pedido los cambios en sus renglones deben ser manejados por el PATCH de los pedidos.
+  * El cliente del API debe asumir que toda solicitud exitosa cumple las reglas de negocios del ERP.
+
+Recomendaciones:
+  * Utilizar vistas de la db para manejar el mapeo a inglés de los nombres de columna
+  * Calcular diariamente en batch las popularidades por artículo
+
+Para desargar en ZIP este repositorio: https://github.com/davidpelaez/erp-api-rjc/archive/master.zip
+Especificación de RAML 1.0: http://docs.raml.org/specs/1.0

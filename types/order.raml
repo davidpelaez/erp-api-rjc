@@ -5,6 +5,9 @@ properties:
     type: array
     items: !include order_entry.raml
   invoice: string
+  created_at: date
+  origin: string # esto sale en la interfaz pero no se que sea
+  id: string # es esto lo mismo que referencia? Si no es lo mismo se debe agregar reference como campo
   invoice_date: date
   balance: number
   comment: string

@@ -34,7 +34,7 @@ types:
   # DEFINICION DE LOS TIPOS QUE DEFINEN CONSTANTES PROVENIENTES DEL ERP
 
   # Todos estos tipos son simples y consisten en Ids y sus nombres
-  Zone: { type: SimpleDuple }
+  OfficeZone: { type: SimpleDuple }
   OfficeSegment: { type: SimpleDuple }
   OfficeType: { type: SimpleDuple }
   OfficeAccount: { type: SimpleDuple }
@@ -211,10 +211,10 @@ securitySchemes:
 
   # DEFINICION DE LISTAS DE SOLO LECTURA USADAS COMO SELECTORES EN EL BIZHUB
 
-  /zones:
+  /offices_zones:
     get:
       responses:
-        200: { body: { type: object, properties: { data: "Zone[]" }}}
+        200: { body: { type: object, properties: { data: "OfficeZone[]" }}}
 
   /offices_segments:
     get:
